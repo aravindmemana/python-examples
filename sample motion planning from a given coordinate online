@@ -1,0 +1,93 @@
+#TEST PROGRAM FOR MOTION PLANNING OF A ROBOT
+#Assumptions
+#      There is no obstacle in the path
+#      Velocity of motion is constant 
+#      Minimum of 40 (%) battery resources is required to successfully intiate the path
+#      The raw data is in text file format
+#the battery status is accepted as an user input since there is no prior data provided.
+#Use python regular expression to extract the x,y coordinates in float
+import re
+#use time to set delay
+import time
+#Use urllib  to access data from a given URL
+import urllib
+b=0
+##numpy to plot the trajectory of motion
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+######################################################################
+# function to extract data and store to a list from the given URL
+def dat_extract():
+#create list to store result
+    x = []
+    y = []
+# 
+    
+    url = "https://pastebin.com/raw/mLc80Pen"
+    f = urllib.request.urlopen(url)
+
+    for line in f:
+        decoded_line = line.decode("utf-8")
+        #extract values from each line using regular expression
+        values = re.findall(r"[-+]?\d*\.?\d+|[-+]?\d+", decoded_line)
+        #extract x-coord from even positions
+        x_temp = values[0::2]
+        #extract y-coord from odd positions
+        y_temp = values[1::2]
+        #extract values from the list x_temp and store it in x
+        for i in x_temp:
+            x.append(float(i))
+        #extract values from the list y_temp and store it in y
+        for j in y_temp:
+            y.append(float(j))
+    #print("The positions coordinates are\n")    
+    #print("X : " , x)
+    #print("Y :" , y)
+    
+  ########################################################################
+#  The home position of the robot at the 
+    print("\nmotion planning of the robot is resuming\n")
+    print("home position of the robot\n")  
+    hx =x[0]
+    hy=y[0]
+    print("Xh : " , hx)
+    print("Yh : " , hy)
+  ## Goal position of the robot  
+    print("\nGoal position of the robot\n")  
+    gx =x[(len(x)-1)]
+    
+    gy=y[(len(y)-1)]
+    print("Xg: " , gx)
+    print("Yg : " , gy)
+ ## Sample robot trajectory
+         
+#    for i in range(len(x)):
+     
+    fig, ax = plt.subplots()
+    ax.plot(x,y)
+    ax.set(xlabel='X position', ylabel='Y position',
+    title='Sample trajectory')
+    ax.grid()
+    plt.text(hx,hy,'ROBOT AT  HOME')
+    plt.text(gx,gy,'ROBOT REACHED DESTINATION')
+    fig.savefig("test.png")
+    plt.show()
+
+
+    
+###Function to check the battery status 
+def battery_check(b):
+   print("Test program for robot motion planning,to proceed....")
+   b=input("enter the value of battery status level(%)")   
+   if (b > "40"):
+    dat_extract()
+   else :
+        
+        print("Insufficient battery,please recharge")
+        time.sleep(3)
+##Calling the check battery status function
+battery_check(b)
+
+#Citations: https://stackoverflow.com/questions/4703390/how-to-extract-a-floating-number-from-a-string
+#    
